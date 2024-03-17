@@ -52,12 +52,12 @@ public class Car : Vehicle
 
     public override void Park()
     {
-        // Logic to park a car
+        Console.WriteLine("Car parked!");
     }
 
     public override void LeaveSpot()
     {
-        // Logic to leave a spot
+        Console.WriteLine("Car left the spot.");
     }
 }
 
@@ -71,12 +71,12 @@ public class Truck : Vehicle
 
     public override void Park()
     {
-        // Logic to park a truck
+        Console.WriteLine("Truck parked!");
     }
 
     public override void LeaveSpot()
     {
-        // Logic to leave a spot
+        Console.WriteLine("Truck left the spot.");
     }
 }
 
@@ -90,12 +90,12 @@ public class Motorcycle : Vehicle
 
     public override void Park()
     {
-        // Logic to park a motorcycle
+        Console.WriteLine("Motorcycle parked!");
     }
 
     public override void LeaveSpot()
     {
-        // Logic to leave a spot
+        Console.WriteLine("Motorcycle left the spot.");
     }
 }
 
@@ -168,20 +168,51 @@ class Program
 {
     static void Main(string[] args)
     {
-        // Example usage
-        ParkingLot parkingLot = new ParkingLot(2, 3, 5);
-        Car car = new Car();
-        Spot spot = parkingLot.FindSpot(car);
+        // Create parking lot
+        Console.WriteLine("Enter the number of levels in the parking lot:");
+        int numberOfLevels = int.Parse(Console.ReadLine());
+
+        Console.WriteLine("Enter the number of rows per level:");
+        int numberOfRows = int.Parse(Console.ReadLine());
+
+        Console.WriteLine("Enter the number of spots per row:");
+        int spotsPerRow = int.Parse(Console.ReadLine());
+
+        ParkingLot parkingLot = new ParkingLot(numberOfLevels, numberOfRows, spotsPerRow);
+
+        // Simulate parking a vehicle
+        Console.WriteLine("Enter the type of vehicle (Car, Truck, Motorcycle):");
+        string vehicleTypeInput = Console.ReadLine();
+        VehicleType vehicleType;
+        Enum.TryParse(vehicleTypeInput, out vehicleType);
+
+        Vehicle vehicle;
+        switch (vehicleType)
+        {
+            case VehicleType.Car:
+                vehicle = new Car();
+                break;
+            case VehicleType.Truck:
+                vehicle = new Truck();
+                break;
+            case VehicleType.Motorcycle:
+                vehicle = new Motorcycle();
+                break;
+            default:
+                Console.WriteLine("Invalid vehicle type!");
+                return;
+        }
+
+        Spot spot = parkingLot.FindSpot(vehicle);
         if (spot != null)
         {
             Console.WriteLine("Spot found!");
-            car.Park();
+            vehicle.Park();
             spot.IsAvailable = false;
-            Console.WriteLine("Car parked!");
         }
         else
         {
-            Console.WriteLine("No available spot for car.");
+            Console.WriteLine("No available spot for the vehicle.");
         }
     }
 }
