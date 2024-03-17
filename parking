@@ -1,0 +1,187 @@
+using System;
+using System.Collections.Generic;
+
+// Enum for vehicle types
+public enum VehicleType
+{
+    Car,
+    Truck,
+    Motorcycle
+}
+
+// Enum for spot sizes
+public enum SpotSize
+{
+    Compact,
+    Regular,
+    Large,
+    Motorcycle
+}
+
+// Class representing a parking spot
+public class Spot
+{
+    public SpotSize Size { get; set; }
+    public bool IsAvailable { get; set; }
+
+    public Spot(SpotSize size)
+    {
+        Size = size;
+        IsAvailable = true;
+    }
+}
+
+// Base class for all vehicles
+public abstract class Vehicle
+{
+    public VehicleType Type { get; set; }
+    public SpotSize Size { get; set; }
+
+    public abstract void Park();
+    public abstract void LeaveSpot();
+}
+
+// Derived classes for specific vehicle types
+public class Car : Vehicle
+{
+    public Car()
+    {
+        Type = VehicleType.Car;
+        Size = SpotSize.Compact;
+    }
+
+    public override void Park()
+    {
+        // Logic to park a car
+    }
+
+    public override void LeaveSpot()
+    {
+        // Logic to leave a spot
+    }
+}
+
+public class Truck : Vehicle
+{
+    public Truck()
+    {
+        Type = VehicleType.Truck;
+        Size = SpotSize.Large;
+    }
+
+    public override void Park()
+    {
+        // Logic to park a truck
+    }
+
+    public override void LeaveSpot()
+    {
+        // Logic to leave a spot
+    }
+}
+
+public class Motorcycle : Vehicle
+{
+    public Motorcycle()
+    {
+        Type = VehicleType.Motorcycle;
+        Size = SpotSize.Motorcycle;
+    }
+
+    public override void Park()
+    {
+        // Logic to park a motorcycle
+    }
+
+    public override void LeaveSpot()
+    {
+        // Logic to leave a spot
+    }
+}
+
+// Class representing a row in a level
+public class Row
+{
+    public List<Spot> Spots { get; set; }
+
+    public Row(int numberOfSpots)
+    {
+        Spots = new List<Spot>();
+        for (int i = 0; i < numberOfSpots; i++)
+        {
+            Spots.Add(new Spot(SpotSize.Regular));
+        }
+    }
+}
+
+// Class representing a level in the parking lot
+public class Level
+{
+    public List<Row> Rows { get; set; }
+    public int AvailableSpots { get; set; }
+
+    public Level(int numberOfRows, int spotsPerRow)
+    {
+        Rows = new List<Row>();
+        for (int i = 0; i < numberOfRows; i++)
+        {
+            Rows.Add(new Row(spotsPerRow));
+        }
+        AvailableSpots = numberOfRows * spotsPerRow;
+    }
+}
+
+// Class representing the parking lot
+public class ParkingLot
+{
+    public List<Level> Levels { get; set; }
+
+    public ParkingLot(int numberOfLevels, int numberOfRows, int spotsPerRow)
+    {
+        Levels = new List<Level>();
+        for (int i = 0; i < numberOfLevels; i++)
+        {
+            Levels.Add(new Level(numberOfRows, spotsPerRow));
+        }
+    }
+
+    public Spot FindSpot(Vehicle vehicle)
+    {
+        foreach (var level in Levels)
+        {
+            foreach (var row in level.Rows)
+            {
+                foreach (var spot in row.Spots)
+                {
+                    if (spot.Size == vehicle.Size && spot.IsAvailable)
+                    {
+                        return spot;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+}
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        // Example usage
+        ParkingLot parkingLot = new ParkingLot(2, 3, 5);
+        Car car = new Car();
+        Spot spot = parkingLot.FindSpot(car);
+        if (spot != null)
+        {
+            Console.WriteLine("Spot found!");
+            car.Park();
+            spot.IsAvailable = false;
+            Console.WriteLine("Car parked!");
+        }
+        else
+        {
+            Console.WriteLine("No available spot for car.");
+        }
+    }
+}
