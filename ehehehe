@@ -218,10 +218,7 @@ public class ParkingLot
     {
         foreach (var level in Levels)
         {
-            foreach (var row in level.Rows)
-            {
-                level.AvailableSpots += change;
-            }
+            level.AvailableSpots += change;
         }
     }
 
@@ -282,11 +279,13 @@ class Program
         // Removing a vehicle
         // Assuming user provides spot details for removal
         Console.WriteLine("Enter the level, row, and spot index to remove the vehicle (e.g., 1 2 3):");
-        string[] spotDetails = Console.ReadLine().Split(' ');
-        int levelIndex = int.Parse(spotDetails[0]) - 1;
-        int rowIndex
-= int.Parse(spotDetails[1]) - 1;
+        string[] spot
+
+Details = Console.ReadLine().Split(’ ’);
+int levelIndex = int.Parse(spotDetails[0]) - 1;
+int rowIndex = int.Parse(spotDetails[1]) - 1;
 int spotIndex = int.Parse(spotDetails[2]) - 1;
+
     if (levelIndex < parkingLot.Levels.Count &&
         rowIndex < parkingLot.Levels[levelIndex].Rows.Count &&
         spotIndex < parkingLot.Levels[levelIndex].Rows[rowIndex].Spots.Count)
@@ -297,5 +296,4 @@ int spotIndex = int.Parse(spotDetails[2]) - 1;
     {
         Console.WriteLine("Invalid spot details.");
     }
-}
 }
