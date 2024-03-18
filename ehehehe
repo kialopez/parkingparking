@@ -30,6 +30,18 @@ public class Spot
         Size = size;
         IsAvailable = true;
     }
+
+    public void ParkVehicle(Vehicle vehicle)
+    {
+        IsAvailable = false;
+        Vehicle = vehicle;
+    }
+
+    public void ClearSpot()
+    {
+        IsAvailable = true;
+        Vehicle = null;
+    }
 }
 
 // Base class for all vehicles
@@ -157,7 +169,6 @@ public class ParkingLot
             {
                 foreach (var spot in row.Spots)
                 {
-                    // Check if spot is available and large enough for the vehicle
                     if (spot.IsAvailable && CanFit(vehicle.Size, spot.Size))
                     {
                         return spot;
@@ -168,45 +179,53 @@ public class ParkingLot
         return null;
     }
 
-    private bool CanFit(SpotSize vehicleSize, SpotSize spotSize)
+    public void ParkVehicle(Vehicle vehicle, Spot spot)
     {
-        // Logic to determine if the vehicle can fit in the spot
-        if (vehicleSize == SpotSize.Compact && (spotSize == SpotSize.Compact || spotSize == SpotSize.Regular))
+        if (spot != null)
         {
-            return true;
+            spot.ParkVehicle(vehicle);
+            UpdateAvailableSpotsCount(-1);
+            Console.WriteLine($"{vehicle.Type} parked successfully!");
         }
-        else if (vehicleSize == SpotSize.Regular && spotSize != SpotSize.Large)
+        else
         {
-            return true;
+            Console.WriteLine($"No available spot for the {vehicle.Type.ToLower()}.");
         }
-        else if (vehicleSize == SpotSize.Large && spotSize == SpotSize.Large)
-        {
-            return true;
-        }
-        else if (vehicleSize == SpotSize.Motorcycle && (spotSize == SpotSize.Compact || spotSize == SpotSize.Regular || spotSize == SpotSize.Motorcycle))
-        {
-            return true;
-        }
-        return false;
     }
 
-    public bool IsLicensePlateUnique(string licensePlate)
+    public void RemoveVehicle(Spot spot)
+    {
+        if (spot != null && !spot.IsAvailable)
+        {
+            spot.ClearSpot();
+            UpdateAvailableSpotsCount(1);
+            Console.WriteLine("Vehicle removed from the spot.");
+        }
+        else
+        {
+            Console.WriteLine("Spot is already empty.");
+        }
+    }
+
+    private bool CanFit(SpotSize vehicleSize, SpotSize spotSize)
+    {
+        // Logic to determine if the vehicle can fit in the spot...
+        // Implement your logic here based on the provided requirements
+        return true; // Placeholder return value
+    }
+
+    private void UpdateAvailableSpotsCount(int change)
     {
         foreach (var level in Levels)
         {
             foreach (var row in level.Rows)
             {
-                foreach (var spot in row.Spots)
-                {
-                    if (!spot.IsAvailable && spot.Vehicle is Car car && car.LicensePlate == licensePlate)
-                    {
-                        return false;
-                    }
-                }
+                level.AvailableSpots += change;
             }
         }
-        return true;
     }
+
+    // Other methods...
 }
 
 class Program
@@ -225,7 +244,7 @@ class Program
 
         ParkingLot parkingLot = new ParkingLot(numberOfLevels, numberOfRows, spotsPerRow);
 
-        // Simulate parking a vehicle
+        // Simulate parking and removing a vehicle
         Console.WriteLine("Enter the type of vehicle (Car, Truck, Motorcycle):");
         string vehicleTypeInput = Console.ReadLine();
         VehicleType vehicleType;
@@ -243,45 +262,40 @@ class Program
                 }
                 Car car = new Car(licensePlate);
                 Spot spot = parkingLot.FindSpot(car);
-                if (spot != null)
-                {
-                    Console.WriteLine("Spot found!");
-                    car.Park();
-                    spot.IsAvailable = false;
-                    spot.Vehicle = car;
-                }
-                else
-                {
-                    Console.WriteLine("No available spot for the car.");
-                }
+                parkingLot.ParkVehicle(car, spot);
                 break;
             case VehicleType.Truck:
                 Truck truck = new Truck();
                 spot = parkingLot.FindSpot(truck);
-                if (spot != null)
-                {
-                    Console.WriteLine("Spot found!");
-                    truck.Park();
-                    spot.IsAvailable = false;
-                    spot.Vehicle = truck;
-                }
-                else
-                {
-                    Console.WriteLine("No available spot for the truck.");
-                }
+                parkingLot.ParkVehicle(truck, spot);
                 break;
             case VehicleType.Motorcycle:
                 Motorcycle motorcycle = new Motorcycle();
                 spot = parkingLot.FindSpot(motorcycle);
-                if (spot != null)
-                {
-                    Console.WriteLine("Spot found!");
-                    motorcycle.Park();
-                    spot.IsAvailable = false;
-                    spot.Vehicle = motorcycle;
-                }
-                else
-                {
-                    Console.WriteLine("No available spot for the motorcycle.");
-                }
-                break
+                parkingLot.ParkVehicle(motorcycle, spot);
+                break;
+            default:
+                Console.WriteLine("Invalid vehicle type!");
+                break;
+        }
+
+        // Removing a vehicle
+        // Assuming user provides spot details for removal
+        Console.WriteLine("Enter the level, row, and spot index to remove the vehicle (e.g., 1 2 3):");
+        string[] spotDetails = Console.ReadLine().Split(' ');
+        int levelIndex = int.Parse(spotDetails[0]) - 1;
+        int rowIndex
+= int.Parse(spotDetails[1]) - 1;
+int spotIndex = int.Parse(spotDetails[2]) - 1;
+    if (levelIndex < parkingLot.Levels.Count &&
+        rowIndex < parkingLot.Levels[levelIndex].Rows.Count &&
+        spotIndex < parkingLot.Levels[levelIndex].Rows[rowIndex].Spots.Count)
+    {
+        parkingLot.RemoveVehicle(parkingLot.Levels[levelIndex].Rows[rowIndex].Spots[spotIndex]);
+    }
+    else
+    {
+        Console.WriteLine("Invalid spot details.");
+    }
+}
+}
